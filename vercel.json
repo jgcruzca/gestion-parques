@@ -2,12 +2,13 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "framework": null,
+  "regions": ["iad1"],
   "buildCommand": "npm run build",
   "outputDirectory": "public",
   "functions": {
     "api/index.php": {
       "runtime": "vercel-php@0.7.3",
-      "maxDuration": 30
+      "maxDuration": 60
     }
   },
   "crons": [
