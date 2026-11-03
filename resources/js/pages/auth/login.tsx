@@ -1,4 +1,4 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import { type FormEventHandler, useState } from 'react';
 
@@ -38,7 +38,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     };
 
     return (
-        <AuthLayout title="Bienvenido de nuevo" description="Ingresa con tu cuenta institucional para continuar.">
+        <AuthLayout title="Bienvenido de nuevo" description="Ingresa con tu cuenta o prueba la demo con datos de ejemplo.">
             <Head title="Iniciar sesión" />
 
             <form className="flex flex-col gap-5" onSubmit={submit}>
@@ -127,6 +127,23 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     </Button>
                 </div>
             </form>
+
+            <div className="mt-5 grid gap-3">
+                <div className="text-muted-foreground flex items-center gap-3 text-[11px] uppercase tracking-wider">
+                    <span className="bg-border h-px flex-1" /> o <span className="bg-border h-px flex-1" />
+                </div>
+                <Button
+                    type="button"
+                    variant="outline"
+                    className="h-11 w-full rounded-[10px] text-[13px] font-semibold"
+                    onClick={() => router.post(route('demo.login'))}
+                >
+                    Entrar a la demo (sin registro)
+                </Button>
+                <p className="text-muted-foreground text-center text-[11.5px]">
+                    ¿Primera vez? <TextLink href={route('register')}>Crea tu cuenta</TextLink>
+                </p>
+            </div>
 
             {status && (
                 <div

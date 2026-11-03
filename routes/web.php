@@ -140,5 +140,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 });
 
+// Limpieza periódica de cuentas demo: la invoca el cron de Vercel con `Authorization: Bearer $CRON_SECRET`.
+Route::get('/cron/demo-purge', function (Illuminate\Http\Request $request) {
+    $secret = (string) config('app.cron_secret');
+    abort_unless($secret !== '' && hash_equals('Bearer '.$secret, (string) $request->header('Authorization')), 403);
+    Illuminate\Support\Facades\Artisan::call('demo:purge');
+
+    return response(trim(Illuminate\Support\Facades\Artisan::output()));
+})->name('cron.demo-purge');
+
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

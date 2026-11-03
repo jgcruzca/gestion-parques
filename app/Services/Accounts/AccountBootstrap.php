@@ -118,36 +118,67 @@ class AccountBootstrap
             ['first_name' => 'Laura', 'last_name' => 'Demo Rojas', 'position' => 'Jardinera', 'crew' => 'Cuadrilla A'],
             ['first_name' => 'Marco', 'last_name' => 'Demo Vega', 'position' => 'Operario de riego', 'crew' => 'Cuadrilla A'],
             ['first_name' => 'Elena', 'last_name' => 'Demo Campos', 'position' => 'Supervisora', 'crew' => 'Cuadrilla B'],
+            ['first_name' => 'Diego', 'last_name' => 'Demo Salas', 'position' => 'Podador', 'crew' => 'Cuadrilla B'],
+            ['first_name' => 'Rosa', 'last_name' => 'Demo Ibáñez', 'position' => 'Jardinera', 'crew' => 'Cuadrilla C'],
         ])->map(fn (array $data) => Worker::create($data + ['is_active' => true, 'is_demo' => true]));
 
+        // [nombre, tipo, zona, dirección, lat, lng, área verde, área total, conservación, días desde el registro]
         $parks = [
-            ['name' => 'Parque Demo Central', 'green_area_type' => 'Parque', 'zone' => 'Zona Norte', 'address' => 'Av. Ejemplo 100', 'latitude' => -12.0464, 'longitude' => -77.0428, 'green_area' => 5200, 'total_area' => 7800],
-            ['name' => 'Plaza Demo de la Amistad', 'green_area_type' => 'Plaza', 'zone' => 'Zona Centro', 'address' => 'Jr. Ejemplo 45', 'latitude' => -12.0500, 'longitude' => -77.0380, 'green_area' => 900, 'total_area' => 1600],
-            ['name' => 'Óvalo Demo Los Jardines', 'green_area_type' => 'Óvalo', 'zone' => 'Zona Sur', 'address' => 'Cruce Av. Ejemplo / Calle 7', 'latitude' => -12.0560, 'longitude' => -77.0450, 'green_area' => 420, 'total_area' => 600],
+            ['Parque Demo Central', 'Parque', 'Zona Norte', 'Av. Ejemplo 100', -12.0464, -77.0428, 5200, 7800, 'bueno', 40],
+            ['Plaza Demo de la Amistad', 'Plaza', 'Zona Centro', 'Jr. Ejemplo 45', -12.0500, -77.0380, 900, 1600, 'bueno', 25],
+            ['Óvalo Demo Los Jardines', 'Óvalo', 'Zona Sur', 'Cruce Av. Ejemplo / Calle 7', -12.0560, -77.0450, 420, 600, 'regular', 18],
+            ['Alameda Demo del Río', 'Alameda', 'Zona Este', 'Paseo Ribereño s/n', -12.0420, -77.0300, 2300, 3100, 'bueno', 33],
+            ['Jardín Demo Botánico', 'Jardín', 'Zona Norte', 'Calle Flores 12', -12.0380, -77.0460, 700, 900, 'bueno', 12],
+            ['Parque Demo Los Pinos', 'Parque', 'Zona Oeste', 'Av. Los Pinos 800', -12.0510, -77.0560, 4100, 6000, 'regular', 50],
+            ['Berma Demo Panamericana', 'Berma Central', 'Zona Sur', 'Av. Principal km 3', -12.0620, -77.0390, 1500, 1800, 'malo', 8],
+            ['Plaza Demo San Martín', 'Plaza', 'Zona Centro', 'Plaza de Armas s/n', -12.0450, -77.0310, 1100, 2000, 'regular', 22],
         ];
 
-        $created = collect($parks)->map(fn (array $data) => Park::create($data + [
-            'conservation_status' => 'bueno',
-            'has_water_point' => true,
+        $created = collect($parks)->map(fn (array $p) => Park::create([
+            'name' => $p[0], 'green_area_type' => $p[1], 'zone' => $p[2], 'address' => $p[3],
+            'latitude' => $p[4], 'longitude' => $p[5], 'green_area' => $p[6], 'total_area' => $p[7],
+            'conservation_status' => $p[8],
+            'has_water_point' => $p[8] !== 'malo',
+            'water_point_status' => $p[8] === 'malo' ? null : 'operativo',
             'is_active' => true,
             'is_demo' => true,
-            'registration_date' => now()->subDays(30)->toDateString(),
+            'registration_date' => now()->subDays($p[9])->toDateString(),
         ]));
 
-        // Un mantenimiento ya ejecutado para que los indicadores muestren actividad.
-        $record = MaintenanceRecord::query()->where('park_id', $created->first()->id)->orderBy('scheduled_date')->first();
-        $worker = $workers->first();
+        // Reparte el historial: algunos mantenimientos ejecutados (a tiempo y con retraso),
+        // uno en proceso y el resto queda pendiente o vencido según su fecha programada.
+        $records = MaintenanceRecord::query()->orderBy('scheduled_date')->orderBy('id')->get();
+        $finalizados = $records->filter(fn ($r) => $r->scheduled_date && $r->scheduled_date->isPast())->values();
 
-        $record?->update([
-            'status' => 'finalizado',
-            'execution_date' => now()->subDays(2)->toDateString(),
-            'start_time' => '08:00',
-            'end_time' => '10:00',
-            'duration_minutes' => 120,
-            'worker_id' => $worker->id,
-            'responsible_worker' => $worker->full_name,
-            'work_description' => 'Mantenimiento de ejemplo generado con los datos de demostración.',
-            'result' => 'completado',
+        foreach ($finalizados->take(10) as $i => $record) {
+            $worker = $workers[$i % $workers->count()];
+            $delay = $i % 3 === 0 ? 2 : 0;
+            $execution = $record->scheduled_date->copy()->addDays($delay);
+
+            if ($execution->isFuture()) {
+                $execution = now()->subDay();
+            }
+
+            $record->update([
+                'status' => 'finalizado',
+                'execution_date' => $execution->toDateString(),
+                'start_time' => '08:00',
+                'end_time' => '10:30',
+                'duration_minutes' => 150,
+                'worker_id' => $worker->id,
+                'responsible_worker' => $worker->full_name,
+                'work_description' => 'Mantenimiento de ejemplo generado con los datos de demostración.',
+                'result' => 'completado',
+            ]);
+        }
+
+        $enProceso = $finalizados->skip(10)->first() ?? $records->firstWhere('status', 'pendiente');
+        $enProceso?->update([
+            'status' => 'en_proceso',
+            'execution_date' => now()->toDateString(),
+            'start_time' => '09:00',
+            'worker_id' => $workers[2]->id,
+            'responsible_worker' => $workers[2]->full_name,
         ]);
     }
 }

@@ -10,6 +10,9 @@
       "maxDuration": 30
     }
   },
+  "crons": [
+    { "path": "/cron/demo-purge", "schedule": "0 5 * * *" }
+  ],
   "routes": [
     { "src": "/index.php", "dest": "/api/index.php" },
     { "handle": "filesystem" },

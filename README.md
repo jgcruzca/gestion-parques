@@ -4,6 +4,12 @@ Aplicación web para administrar parques, plazas y demás áreas verdes, program
 
 Cada persona que se registra obtiene un **espacio privado**: sus parques, trabajadores, mantenimientos, configuración y reportes no son visibles para nadie más. Al crear la cuenta se cargan catálogos editables y unos pocos **datos de demostración ficticios** que se eliminan con un clic desde *Configuración*.
 
+## Demo en vivo
+
+> URL: _(agrega aquí la URL de Vercel)_
+
+Pulsa **«Entrar a la demo (sin registro)»** en la pantalla de acceso: se crea al instante una cuenta temporal con 8 parques, 5 trabajadores y un historial de mantenimientos (a tiempo, atrasados y en proceso) para recorrer dashboard, mapa, reportes PDF/CSV y el asistente Yaku. Cada visitante tiene su propio espacio aislado y las cuentas demo se eliminan solas a las 24 h (`php artisan demo:purge`, ejecutado por Vercel Cron con `CRON_SECRET`).
+
 ## Funcionalidades
 
 - **Dashboard operativo:** indicadores, metas mensuales, tendencias, alertas y mantenimientos prioritarios.
@@ -50,7 +56,7 @@ Laravel no es un runtime oficial de Vercel: se usa el runtime comunitario [`verc
    DB_CONNECTION=pgsql DB_URL="postgresql://..." php artisan migrate --force
    ```
 2. Crea un bucket en R2 con lectura pública (dominio `r2.dev` o propio) y un token de API con lectura/escritura.
-3. Importa el repositorio en Vercel y define las variables anteriores, más `APP_KEY` (`php artisan key:generate --show`) y `APP_URL`.
+3. Importa el repositorio en Vercel y define las variables anteriores, más `APP_KEY` (`php artisan key:generate --show`), `APP_URL` y `CRON_SECRET` (cualquier cadena larga; Vercel la envía al cron de limpieza). Para la demo no hace falta Resend: sin él se oculta «¿Olvidaste tu contraseña?».
 4. Despliega: Vercel ejecuta `npm run build` y sirve `api/index.php` con PHP.
 
 Las sesiones usan cookies y los logs van a `stderr`. Las fotos de los parques son públicas por URL; no subas información sensible en ellas.

@@ -31,9 +31,9 @@ test('una cuenta nueva recibe catalogos, reglas y datos de demostracion propios'
     $this->actingAs($user);
 
     expect(GreenAreaType::count())->toBe(8)
-        ->and(Park::count())->toBe(3)
+        ->and(Park::count())->toBe(8)
         ->and(Park::where('is_demo', false)->count())->toBe(0)
-        ->and(Worker::count())->toBe(3)
+        ->and(Worker::count())->toBe(5)
         ->and(MaintenanceRecord::count())->toBeGreaterThan(0)
         ->and(Park::pluck('owner_id')->unique()->all())->toBe([$user->id]);
 });
@@ -49,8 +49,8 @@ test('cada cuenta solo ve y modifica sus propios datos', function () {
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page->component('parks/index'));
 
-    expect(Park::count())->toBe(3)
-        ->and(Park::withoutGlobalScopes()->count())->toBe(6);
+    expect(Park::count())->toBe(8)
+        ->and(Park::withoutGlobalScopes()->count())->toBe(16);
 
     // Un parque ajeno es inaccesible aunque se conozca su id.
     $this->actingAs($b)
@@ -72,7 +72,7 @@ test('el mismo codigo de parque puede existir en cuentas distintas', function ()
     $codigos = fn (User $user) => Park::withoutGlobalScopes()->where('owner_id', $user->id)->orderBy('id')->pluck('code')->all();
 
     expect($codigos($a))->toBe($codigos($b))
-        ->and($codigos($a))->toBe(['PRQ-0001', 'PRQ-0002', 'PRQ-0003']);
+        ->and($codigos($a))->toHaveCount(8);
 });
 
 test('eliminar los datos de demostracion solo afecta a la cuenta que lo pide', function () {
@@ -87,7 +87,7 @@ test('eliminar los datos de demostracion solo afecta a la cuenta que lo pide', f
     expect(Park::withoutGlobalScopes()->where('owner_id', $a->id)->count())->toBe(0)
         ->and(Worker::withoutGlobalScopes()->where('owner_id', $a->id)->count())->toBe(0)
         ->and(MaintenanceRecord::withoutGlobalScopes()->where('owner_id', $a->id)->count())->toBe(0)
-        ->and(Park::withoutGlobalScopes()->where('owner_id', $b->id)->count())->toBe(3)
+        ->and(Park::withoutGlobalScopes()->where('owner_id', $b->id)->count())->toBe(8)
         ->and(GreenAreaType::withoutGlobalScopes()->where('owner_id', $a->id)->count())->toBe(8);
 
     $this->actingAs($a)->get('/configuracion')

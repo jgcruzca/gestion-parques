@@ -15,6 +15,9 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    // Secreto con el que Vercel Cron autentica la limpieza de cuentas demo.
+    'cron_secret' => env('CRON_SECRET', ''),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment
