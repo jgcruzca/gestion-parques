@@ -1,0 +1,438 @@
+@import 'tailwindcss';
+
+@utility field {
+    @apply bg-background mt-1 w-full rounded-xl border px-3 py-2 text-xs font-normal transition outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500;
+}
+
+@plugin 'tailwindcss-animate';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+    --font-sans:
+        'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --radius-lg: var(--radius);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-sm: calc(var(--radius) - 4px);
+
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+
+    --color-brand: var(--brand);
+    --color-brand-strong: var(--brand-strong);
+    --color-brand-soft: var(--brand-soft);
+
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+
+    --color-sidebar: var(--sidebar-background);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+}
+
+.park-location-map {
+    max-width: 100%;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.park-location-map .leaflet-control-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.park-location-map .leaflet-control {
+    pointer-events: auto;
+}
+
+:root {
+    /* Superficies: blanco de trabajo con neutro apenas verdoso, no gris de plantilla. */
+    --background: hsl(150, 14%, 97%);
+    --foreground: hsl(160, 14%, 13%);
+    --card: hsl(0, 0%, 100%);
+    --card-foreground: hsl(160, 14%, 13%);
+    --popover: hsl(0, 0%, 100%);
+    --popover-foreground: hsl(160, 14%, 13%);
+    --primary: hsl(158, 72%, 25%);
+    --primary-foreground: hsl(0, 0%, 100%);
+    --secondary: hsl(150, 12%, 95%);
+    --secondary-foreground: hsl(160, 30%, 18%);
+    --muted: hsl(150, 12%, 94.5%);
+    --muted-foreground: hsl(160, 7%, 40%);
+    --accent: hsl(155, 38%, 93%);
+    --accent-foreground: hsl(160, 60%, 20%);
+    --destructive: hsl(352, 74%, 45%);
+    --destructive-foreground: hsl(0, 0%, 100%);
+    --border: hsl(150, 10%, 88%);
+    --input: hsl(150, 10%, 85%);
+    --ring: hsl(158, 66%, 32%);
+    --chart-1: hsl(352, 74%, 52%);
+    --chart-2: hsl(158, 64%, 36%);
+    --chart-3: hsl(198, 78%, 42%);
+    --chart-4: hsl(36, 90%, 48%);
+    --chart-5: hsl(262, 60%, 58%);
+    --radius: 0.625rem;
+    --brand: hsl(158, 72%, 25%);
+    --brand-strong: hsl(158, 76%, 19%);
+    --brand-soft: hsl(155, 44%, 94%);
+    --sidebar-background: hsl(150, 15%, 95.5%);
+    --sidebar-foreground: hsl(160, 12%, 30%);
+    --sidebar-primary: hsl(158, 72%, 25%);
+    --sidebar-primary-foreground: hsl(0, 0%, 100%);
+    --sidebar-accent: hsl(155, 40%, 90%);
+    --sidebar-accent-foreground: hsl(160, 55%, 20%);
+    --sidebar-border: hsl(150, 11%, 87%);
+    --sidebar-ring: hsl(158, 66%, 32%);
+}
+
+.dark {
+    --background: hsl(160, 13%, 7.5%);
+    --foreground: hsl(150, 12%, 93%);
+    --card: hsl(160, 12%, 10.5%);
+    --card-foreground: hsl(150, 12%, 93%);
+    --popover: hsl(160, 12%, 12%);
+    --popover-foreground: hsl(150, 12%, 93%);
+    --primary: hsl(155, 55%, 52%);
+    --primary-foreground: hsl(160, 30%, 8%);
+    --secondary: hsl(160, 10%, 16%);
+    --secondary-foreground: hsl(150, 12%, 90%);
+    --muted: hsl(160, 10%, 15%);
+    --muted-foreground: hsl(150, 7%, 64%);
+    --accent: hsl(157, 22%, 18%);
+    --accent-foreground: hsl(150, 20%, 92%);
+    --destructive: hsl(352, 66%, 56%);
+    --destructive-foreground: hsl(0, 0%, 100%);
+    --border: hsl(158, 8%, 19%);
+    --input: hsl(158, 8%, 23%);
+    --ring: hsl(155, 55%, 48%);
+    --chart-1: hsl(352, 72%, 62%);
+    --chart-2: hsl(155, 55%, 52%);
+    --chart-3: hsl(198, 68%, 58%);
+    --chart-4: hsl(38, 88%, 60%);
+    --chart-5: hsl(262, 60%, 70%);
+    --brand: hsl(155, 55%, 52%);
+    --brand-strong: hsl(155, 60%, 62%);
+    --brand-soft: hsl(157, 30%, 16%);
+    --sidebar-background: hsl(160, 14%, 9%);
+    --sidebar-foreground: hsl(150, 8%, 72%);
+    --sidebar-primary: hsl(155, 55%, 52%);
+    --sidebar-primary-foreground: hsl(160, 30%, 8%);
+    --sidebar-accent: hsl(157, 26%, 16%);
+    --sidebar-accent-foreground: hsl(150, 20%, 94%);
+    --sidebar-border: hsl(158, 8%, 17%);
+    --sidebar-ring: hsl(155, 55%, 48%);
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    html {
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+        overflow-wrap: break-word;
+        font-feature-settings: 'cv11', 'ss01';
+        text-rendering: optimizeLegibility;
+    }
+
+    img,
+    video {
+        max-width: 100%;
+    }
+
+    ::selection {
+        background: color-mix(in oklab, var(--brand) 22%, transparent);
+        color: var(--foreground);
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--ring);
+        outline-offset: 2px;
+    }
+
+    /* Barra de desplazamiento: parte de la superficie, no del navegador. */
+    * {
+        scrollbar-color: color-mix(in oklab, var(--foreground) 22%, transparent) transparent;
+        scrollbar-width: thin;
+    }
+
+    *::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    *::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        border: 3px solid transparent;
+        border-radius: 999px;
+        background-clip: content-box;
+        background-color: color-mix(in oklab, var(--foreground) 24%, transparent);
+    }
+
+    *::-webkit-scrollbar-thumb:hover {
+        background-color: color-mix(in oklab, var(--foreground) 38%, transparent);
+    }
+}
+
+@layer components {
+    /* Lienzo de página: una sola medida para todas las pantallas operativas. */
+    .page-shell {
+        @apply bg-background flex flex-1 flex-col p-4 md:p-6;
+    }
+
+    .page-container {
+        @apply mx-auto flex w-full max-w-[1480px] flex-1 flex-col gap-5;
+    }
+
+    .surface {
+        @apply bg-card rounded-[14px] border shadow-[0_1px_2px_0_rgb(12_38_28/0.05)];
+    }
+
+    .page-title {
+        @apply text-foreground text-[22px] leading-tight font-semibold tracking-[-0.02em] md:text-[26px];
+    }
+
+    .page-description {
+        @apply text-muted-foreground mt-1.5 max-w-[72ch] text-[13px] leading-relaxed;
+    }
+
+    .section-title {
+        @apply text-foreground text-[15px] font-semibold tracking-[-0.01em];
+    }
+
+    .section-description {
+        @apply text-muted-foreground mt-1 text-[12px] leading-relaxed;
+    }
+
+    .label-caps {
+        @apply text-muted-foreground text-[11px] font-semibold tracking-[0.08em] uppercase;
+    }
+
+    .stat-value {
+        @apply text-foreground text-[28px] leading-none font-semibold tracking-[-0.02em] tabular-nums;
+    }
+
+    .stat-label {
+        @apply text-muted-foreground text-[12px] font-medium;
+    }
+
+    .stat-hint {
+        @apply text-muted-foreground text-[11px] leading-snug;
+    }
+
+    /* Tablas de datos: densidad legible, cifras alineadas. */
+    .data-table {
+        @apply w-full border-collapse text-left;
+    }
+
+    .data-table thead {
+        @apply bg-muted/60;
+    }
+
+    .data-table th {
+        @apply text-muted-foreground border-b px-4 py-2.5 text-[11px] font-semibold tracking-[0.06em] whitespace-nowrap uppercase;
+    }
+
+    .data-table td {
+        @apply border-border/70 text-foreground border-b px-4 py-3 align-middle text-[13px];
+    }
+
+    .data-table tbody tr {
+        @apply transition-colors;
+    }
+
+    .data-table tbody tr:hover {
+        @apply bg-muted/45;
+    }
+
+    .data-table tbody tr:last-child td {
+        @apply border-b-0;
+    }
+
+    .pill {
+        @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold whitespace-nowrap;
+    }
+
+    .field-control {
+        @apply bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/15 h-10 w-full rounded-[10px] border px-3 text-[13px] transition outline-none focus:ring-2;
+    }
+
+    .toolbar {
+        @apply flex flex-col gap-3 border-b p-4 lg:flex-row lg:items-center lg:justify-between;
+    }
+}
+
+/* Chat de Yaku: movimiento discreto, nunca decorativo de más. */
+.yaku-leaf {
+    animation: yaku-sway 6s ease-in-out infinite;
+    transform-box: view-box;
+    transform-origin: 32px 27px;
+}
+
+.yaku-panel {
+    animation: yaku-panel-in 180ms ease-out;
+}
+
+.yaku-typing-dot {
+    animation: yaku-typing 1.2s ease-in-out infinite;
+}
+
+@keyframes yaku-sway {
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+
+    50% {
+        transform: rotate(3deg);
+    }
+}
+
+@keyframes yaku-panel-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.985);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes yaku-typing {
+    0%,
+    60%,
+    100% {
+        opacity: 0.35;
+        transform: translateY(0);
+    }
+
+    30% {
+        opacity: 1;
+        transform: translateY(-3px);
+    }
+}
+
+@keyframes auth-photo-in {
+    from {
+        opacity: 0;
+        transform: scale(1.08);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1.03);
+    }
+}
+
+@keyframes auth-rise {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.auth-photo {
+    animation: auth-photo-in 1.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.auth-brand > * {
+    animation: auth-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.auth-brand > *:nth-child(2) {
+    animation-delay: 0.08s;
+}
+
+.auth-brand > *:nth-child(3) {
+    animation-delay: 0.16s;
+}
+
+.auth-panel > * {
+    animation: auth-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-photo,
+    .auth-brand > *,
+    .auth-panel > * {
+        animation: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .yaku-leaf,
+    .yaku-panel,
+    .yaku-typing-dot {
+        animation: none;
+    }
+}
