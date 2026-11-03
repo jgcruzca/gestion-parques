@@ -1263,17 +1263,17 @@ class EjecutorAcciones
                     $consulta->where('scheduled_date', '<', $inicioManana);
                 }
 
-                return $consulta->orderBy($this->orden($p, 'scheduled_date'))->orderBy('id');
+                return $consulta->orderBy('scheduled_date', $this->orden($p, 'scheduled_date'))->orderBy('id');
 
             case 'vencido':
                 OperationalScope::overdue($consulta, $inicioHoy);
 
-                return $entre($consulta, 'scheduled_date')->orderBy($this->orden($p, 'scheduled_date'))->orderBy('id');
+                return $entre($consulta, 'scheduled_date')->orderBy('scheduled_date', $this->orden($p, 'scheduled_date'))->orderBy('id');
 
             case 'proximo':
                 OperationalScope::upcoming($consulta, $inicioManana);
 
-                return $entre($consulta, 'scheduled_date')->orderBy($this->orden($p, 'scheduled_date'))->orderBy('id');
+                return $entre($consulta, 'scheduled_date')->orderBy('scheduled_date', $this->orden($p, 'scheduled_date'))->orderBy('id');
 
             case 'en_proceso':
                 OperationalScope::inProgress($consulta);
@@ -1285,7 +1285,7 @@ class EjecutorAcciones
                     });
                 }
 
-                return $consulta->orderBy($this->orden($p, 'scheduled_date'))->orderBy('id');
+                return $consulta->orderBy('scheduled_date', $this->orden($p, 'scheduled_date'))->orderBy('id');
 
             case 'finalizado':
                 OperationalScope::finished($consulta);
@@ -1318,7 +1318,7 @@ class EjecutorAcciones
 
         OperationalScope::operational($consulta, $inicioManana);
 
-        return $consulta->orderBy($this->orden($p, 'scheduled_date'))->orderBy('id');
+        return $consulta->orderBy('scheduled_date', $this->orden($p, 'scheduled_date'))->orderBy('id');
     }
 
     /**

@@ -148,9 +148,14 @@ class AccountBootstrap
         // Reparte el historial: algunos mantenimientos ejecutados (a tiempo y con retraso),
         // uno en proceso y el resto queda pendiente o vencido según su fecha programada.
         $records = MaintenanceRecord::query()->orderBy('scheduled_date')->orderBy('id')->get();
-        $finalizados = $records->filter(fn ($r) => $r->scheduled_date && $r->scheduled_date->isPast())->values();
+        // Los más recientes ya vencidos se marcan como ejecutados (así hay actividad este mes);
+        // los más antiguos quedan como vencidos para mostrar alertas.
+        $finalizados = $records
+            ->filter(fn ($r) => $r->scheduled_date && $r->scheduled_date->isPast())
+            ->sortByDesc('scheduled_date')
+            ->values();
 
-        foreach ($finalizados->take(10) as $i => $record) {
+        foreach ($finalizados->take(12) as $i => $record) {
             $worker = $workers[$i % $workers->count()];
             $delay = $i % 3 === 0 ? 2 : 0;
             $execution = $record->scheduled_date->copy()->addDays($delay);
@@ -172,7 +177,7 @@ class AccountBootstrap
             ]);
         }
 
-        $enProceso = $finalizados->skip(10)->first() ?? $records->firstWhere('status', 'pendiente');
+        $enProceso = $finalizados->skip(12)->last() ?? $records->firstWhere('status', 'pendiente');
         $enProceso?->update([
             'status' => 'en_proceso',
             'execution_date' => now()->toDateString(),
