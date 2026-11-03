@@ -6,7 +6,7 @@ Cada persona que se registra obtiene un **espacio privado**: sus parques, trabaj
 
 ## Demo en vivo
 
-> URL: _(agrega aquí la URL de Vercel)_
+> URL: https://gestion-parques.vercel.app
 
 Pulsa **«Entrar a la demo (sin registro)»** en la pantalla de acceso: se crea al instante una cuenta temporal con 8 parques, 5 trabajadores y un historial de mantenimientos (a tiempo, atrasados y en proceso) para recorrer dashboard, mapa, reportes PDF/CSV y el asistente Yaku. Cada visitante tiene su propio espacio aislado y las cuentas demo se eliminan solas a las 24 h (`php artisan demo:purge`, ejecutado por Vercel Cron con `CRON_SECRET`).
 

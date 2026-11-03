@@ -20,6 +20,7 @@
     { "src": "/(.*)", "dest": "/api/index.php" }
   ],
   "env": {
+    "APP_NAME": "Sistema Verde",
     "APP_ENV": "production",
     "APP_DEBUG": "false",
     "LOG_CHANNEL": "stderr",
